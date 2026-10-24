@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "team-memory-mcp",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    // Your environment's AuthKit domain (WorkOS dashboard → Domains, or `workos project list`).
+    "AUTHKIT_DOMAIN": "incredible-picture-33-staging.authkit.app",
+    "MEMBERSHIP_CACHE_SECONDS": "60"
+  },
+  // WORKOS_API_KEY is a secret: `npx wrangler secret put WORKOS_API_KEY`.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "team-memory-mcp",
+      "database_id": "914a36d3-207c-4892-b8de-f0627b7b9c80",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "observability": { "enabled": true }
+}

@@ -1,0 +1,2 @@
+# Copy to .dev.vars for `npm run dev`. Never commit the real file.
+WORKOS_API_KEY=sk_test_your_staging_key
