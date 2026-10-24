@@ -83,7 +83,7 @@ async function handleMcp(request: Request, url: URL, deps: Deps): Promise<Respon
     } catch {
       throw new AuthError(503, 'membership_unavailable', 'Couldn’t confirm your organization membership. Try again.')
     }
-    if (!member) throw new AuthError(403, 'not_a_member', 'You’re no longer an active member of this organization.')
+    if (!member) throw new AuthError(403, 'not_a_member', 'Access ended: you’re no longer an active member of this organization.')
 
     // 3. Tools for this caller only.
     const server = buildServer(caller, deps.store)

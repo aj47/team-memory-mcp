@@ -27,8 +27,9 @@ forget("note_…")                                    → only the author can de
 | Token checks: signature, issuer, audience, `org_id` | yes (locally signed JWTs) | yes (real AuthKit tokens) |
 | Isolation: Acme's notes invisible to Globex, even by note id | yes | yes |
 | Offboarding: deactivated member refused while their token is still valid | yes | yes (`403 not_a_member` once the 60 s cache lapsed) |
+| Offboarding in Claude Code | n/a | yes (Claude Code's next token arrived without `org_id`, so `403 no_organization`) |
 | Company SSO through the WorkOS Test Identity Provider | n/a | yes (`example.com` user joined Test Organization automatically) |
-| Claude Code as the client | n/a | **not yet run** (tested with `scripts/dev-token.mjs`, which follows the same discovery and DCR flow) |
+| Claude Code as the client | n/a | yes (registers with a Client ID Metadata Document, `/mcp` → Authenticate) |
 
 ## Run it
 
@@ -89,4 +90,4 @@ to sign in as someone else in the same browser.
 - **Audit Logs:** record who stored and read what, and stream it to the customer's SIEM.
 - **Directory Sync:** offboard automatically when IT removes someone from Okta or Entra.
 - **Search:** full-text or vector search instead of word matching over the latest 500 notes.
-- **Revocation:** check whether removing a member also revokes their MCP refresh token.
+- **Revocation:** in testing, Claude Code's token after a deactivation came back without `org_id`, which the server refuses. Confirm whether that is AuthKit's refresh behavior, and whether removal revokes the refresh token outright.
