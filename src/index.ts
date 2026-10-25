@@ -5,6 +5,8 @@
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js'
 import { AuthError, bearerToken, createTokenVerifier, type TokenVerifier } from './auth.js'
 import { homePage } from './home.js'
+import { demoPage } from './demo.js'
+import { serveMedia } from './media.js'
 import { buildServer } from './mcp.js'
 import { createMembershipCheck, type MembershipCheck } from './membership.js'
 import { D1NoteStore, type NoteStore } from './store.js'
@@ -19,6 +21,8 @@ export interface Env {
   MCP_RESOURCE?: string
   /** How long a membership answer is reused (default 60). */
   MEMBERSHIP_CACHE_SECONDS?: string
+  /** Demo video and poster for /demo (optional). */
+  MEDIA?: R2Bucket
 }
 
 export interface Deps {
@@ -57,6 +61,9 @@ export async function handle(request: Request, deps: Deps): Promise<Response> {
 
   if (url.pathname === '/') {
     return new Response(homePage(deps.resource), { headers: { 'Content-Type': 'text/html; charset=utf-8' } })
+  }
+  if (url.pathname === '/demo') {
+    return new Response(demoPage(), { headers: { 'Content-Type': 'text/html; charset=utf-8' } })
   }
   return new Response('Not found', { status: 404 })
 }
@@ -124,6 +131,9 @@ let cached: { key: string; verify: TokenVerifier; isMember: MembershipCheck } | 
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
+    const { pathname } = new URL(request.url)
+    if (pathname.startsWith('/media/') && env.MEDIA) return serveMedia(request, env.MEDIA, pathname.slice('/media/'.length))
+
     const authServer = `https://${env.AUTHKIT_DOMAIN}`
     const resource = env.MCP_RESOURCE ?? `${new URL(request.url).origin}/mcp`
     const key = `${authServer}|${resource}|${env.MEMBERSHIP_CACHE_SECONDS ?? ''}`

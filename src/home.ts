@@ -47,7 +47,7 @@ export function homePage(resource: string): string {
     <li><b>3</b><div>Your organization's notes only <span>· taken from the token, never from the request</span></div></li>
   </ol>
 
-  <footer>Source, setup and tests: <a href="https://github.com/aj47/team-memory-mcp">github.com/aj47/team-memory-mcp</a> · Sign-in by <a href="https://workos.com/docs/authkit/mcp">WorkOS AuthKit</a></footer>
+  <footer><a href="/demo">Demo video and write-up</a> · Source, setup and tests: <a href="https://github.com/aj47/team-memory-mcp">github.com/aj47/team-memory-mcp</a> · Sign-in by <a href="https://workos.com/docs/authkit/mcp">WorkOS AuthKit</a></footer>
 </main>
 </body>
 </html>`

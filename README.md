@@ -6,6 +6,8 @@ their agent's config: people sign in through [WorkOS AuthKit](https://workos.com
 agent's next call, and every note is walled off by organization. It runs on Cloudflare Workers
 with D1.
 
+**Demo video and write-up:** [team-memory-mcp.techfren.workers.dev/demo](https://team-memory-mcp.techfren.workers.dev/demo)
+
 ```
 remember("Our staging database is db-staging-2")   → saved to your organization's memory
 recall("staging database")                          → only your organization's notes
