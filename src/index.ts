@@ -4,6 +4,7 @@
 
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js'
 import { AuthError, bearerToken, createTokenVerifier, type TokenVerifier } from './auth.js'
+import { homePage } from './home.js'
 import { buildServer } from './mcp.js'
 import { createMembershipCheck, type MembershipCheck } from './membership.js'
 import { D1NoteStore, type NoteStore } from './store.js'
@@ -55,9 +56,7 @@ export async function handle(request: Request, deps: Deps): Promise<Response> {
   if (url.pathname === '/mcp') return cors(await handleMcp(request, url, deps))
 
   if (url.pathname === '/') {
-    return new Response(`Team Memory MCP\n\nAdd ${deps.resource} to your MCP client and sign in.\n`, {
-      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-    })
+    return new Response(homePage(deps.resource), { headers: { 'Content-Type': 'text/html; charset=utf-8' } })
   }
   return new Response('Not found', { status: 404 })
 }
