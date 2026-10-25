@@ -27,6 +27,9 @@ export function demoPage(): string {
   article { max-width: 720px; margin: 64px auto 0; }
   article h2 { font-size: 30px; line-height: 1.2; margin: 0 0 20px; letter-spacing: -0.3px; }
   article p { color: #d4d8e0; margin: 0 0 18px; }
+  figure { margin: 28px 0 32px; }
+  figure img { display: block; width: 100%; height: auto; border: 1px solid var(--edge); border-radius: 8px; }
+  figcaption { color: var(--dim); font-size: 15px; margin-top: 10px; }
   a { color: var(--text); }
   footer { max-width: 720px; margin: 48px auto 0; color: var(--dim); font-size: 15px; border-top: 1px solid var(--edge); padding-top: 20px; }
 </style>
@@ -52,6 +55,10 @@ export function demoPage(): string {
     <p>A startup shipping this would hand out API keys from its own dashboard, and each user would paste one into a config file. That works until a company wants it for five hundred engineers. Their security team sees a long-lived secret the agent can read, no company login, and a key that keeps working after someone leaves.</p>
     <p>So AuthKit is the server's OAuth authorization server, and nobody pastes a key. Claude Code finds AuthKit from the server's metadata, registers itself, and opens a normal sign-in, through the company's SSO if it has one.</p>
     <p>Every request then passes three checks. The token must be valid for this server. The user must still be an active member of their organization, which the server asks WorkOS about with a 60-second cache. And every query is scoped to the organization in the token, never to anything the agent sends. The lesson: a valid token doesn't prove someone still works there.</p>
+    <figure>
+      <img src="/media/three-checks.jpg" width="1392" height="860" loading="lazy" alt="A recall call carrying a Bearer token passes three checks: verify the token against AuthKit's public keys, confirm membership with the WorkOS API (cached 60 seconds), and query D1 only where org_id equals the token's org_id.">
+      <figcaption>Every call: the token, the membership, then a query scoped to the token's organization.</figcaption>
+    </figure>
     <p>Clone the repo, add your WorkOS keys, and connect it to Claude Code. The README covers setup and what comes next: teams with Fine-Grained Authorization, roles, audit logs, and Directory Sync.</p>
     <p><a href="${REPO}">github.com/aj47/team-memory-mcp</a></p>
   </article>
