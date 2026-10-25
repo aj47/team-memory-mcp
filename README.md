@@ -86,6 +86,10 @@ to sign in as someone else in the same browser.
 
 ## With more time
 
+- **Teams:** scope notes to a team inside the organization with WorkOS
+  [Fine-Grained Authorization](https://workos.com/docs/fga): a `team` resource type under the
+  organization, groups (synced from the customer's directory) assigned a role on each team, and
+  `recall` filtered to the teams the caller's membership can view.
 - **Roles:** let admins `forget` any note. Connect tokens carry no permissions, so add
   `organization_membership.roles` to a JWT template or look roles up on the server.
 - **Audit Logs:** record who stored and read what, and stream it to the customer's SIEM.
