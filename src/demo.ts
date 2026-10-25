@@ -39,13 +39,13 @@ export function demoPage(origin: string): string {
   <p class="kicker">WorkOS Developer Relations exercise · AJ</p>
   <h1>Team Memory MCP</h1>
   <video controls preload="metadata" playsinline poster="/media/poster.jpg">
-    <source src="/media/team-memory-demo.mp4" type="video/mp4">
+    <source src="/media/team-memory-demo-v3.mp4" type="video/mp4">
   </video>
   <div class="links">
     <a href="${REPO}">Source and README</a>
     <a href="${REPO}#with-more-time">With more time</a>
     <a href="/">Live server</a>
-    <a href="/media/team-memory-demo.mp4" download>Download video</a>
+    <a href="/media/team-memory-demo-v3.mp4" download>Download video</a>
   </div>
 
   <article>
