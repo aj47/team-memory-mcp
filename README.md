@@ -1,9 +1,10 @@
 # Team Memory MCP
 
-A shared-memory MCP server that's ready for enterprise customers: people sign in through
-[WorkOS AuthKit](https://workos.com/docs/authkit/mcp) (including their company's SSO), every
-note is walled off by organization, and someone removed from the organization loses access on
-their agent's next call. It runs on Cloudflare Workers with D1.
+A shared-memory MCP server that's ready for enterprise customers. Nobody pastes an API key into
+their agent's config: people sign in through [WorkOS AuthKit](https://workos.com/docs/authkit/mcp)
+(including their company's SSO), someone removed from the organization loses access on their
+agent's next call, and every note is walled off by organization. It runs on Cloudflare Workers
+with D1.
 
 ```
 remember("Our staging database is db-staging-2")   → saved to your organization's memory
@@ -16,8 +17,8 @@ forget("note_…")                                    → only the author can de
 | An enterprise buyer asks | How this server answers | Where |
 | --- | --- | --- |
 | Can our people sign in with our company login? | AuthKit is the server's OAuth authorization server. MCP clients discover it from `/.well-known/oauth-protected-resource`, and AuthKit routes company emails to the company's identity provider. | `src/index.ts`, WorkOS dashboard |
-| Is our data separate from other customers? | The organization comes from the verified token's `org_id`, never from tool input, and every query is scoped by it. | `src/auth.ts`, `src/store.ts` |
 | Does access end when someone leaves? | A token stays valid until it expires, so each request also checks the user is still an active member of that organization (cached 60 s). | `src/membership.ts` |
+| Is our data separate from other customers? | The organization comes from the verified token's `org_id`, never from tool input, and every query is scoped by it. | `src/auth.ts`, `src/store.ts` |
 
 ## Status
 
