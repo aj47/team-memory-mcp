@@ -54,6 +54,7 @@ export async function handle(request: Request, deps: Deps): Promise<Response> {
   // For clients that skip protected-resource metadata: AuthKit stays the source of truth.
   if (url.pathname === '/.well-known/oauth-authorization-server') {
     const upstream = await (deps.fetchImpl ?? fetch)(`${deps.authServer}/.well-known/oauth-authorization-server`)
+    if (!upstream.ok) return cors(Response.json({ error: 'authorization_server_unavailable' }, { status: 502 }))
     return cors(Response.json(await upstream.json()))
   }
 
@@ -63,20 +64,18 @@ export async function handle(request: Request, deps: Deps): Promise<Response> {
     return new Response(homePage(deps.resource), { headers: { 'Content-Type': 'text/html; charset=utf-8' } })
   }
   if (url.pathname === '/demo') {
-    return new Response(demoPage(), { headers: { 'Content-Type': 'text/html; charset=utf-8' } })
+    return new Response(demoPage(url.origin), { headers: { 'Content-Type': 'text/html; charset=utf-8' } })
   }
   return new Response('Not found', { status: 404 })
 }
 
 async function handleMcp(request: Request, url: URL, deps: Deps): Promise<Response> {
-  const challenge = [
-    'Bearer error="unauthorized"',
-    'error_description="Authorization needed"',
-    `resource_metadata="${url.origin}/.well-known/oauth-protected-resource"`,
-  ].join(', ')
+  const metadata = `resource_metadata="${url.origin}/.well-known/oauth-protected-resource"`
 
+  // RFC 6750 §3.1: no `error` when the request carried no token at all.
   const token = bearerToken(request)
-  if (!token) return refuse(new AuthError(401, 'unauthorized', 'Sign in to use team memory.'), challenge)
+  if (!token) return refuse(new AuthError(401, 'unauthorized', 'Sign in to use team memory.'), `Bearer ${metadata}`)
+  const challenge = `Bearer error="invalid_token", error_description="The access token is invalid or has expired", ${metadata}`
 
   try {
     // 1. Who is calling, and under which organization.
@@ -89,7 +88,7 @@ async function handleMcp(request: Request, url: URL, deps: Deps): Promise<Respon
     } catch {
       throw new AuthError(503, 'membership_unavailable', 'Couldn’t confirm your organization membership. Try again.')
     }
-    if (!member) throw new AuthError(403, 'not_a_member', 'Access ended: you’re no longer an active member of this organization.')
+    if (!member) throw new AuthError(403, 'not_a_member', 'Access ended: you’re no longer a member of this organization.')
 
     // 3. Tools for this caller only.
     const server = buildServer(caller, deps.store)

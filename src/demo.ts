@@ -3,7 +3,7 @@
 
 const REPO = 'https://github.com/aj47/team-memory-mcp'
 
-export function demoPage(): string {
+export function demoPage(origin: string): string {
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -12,7 +12,7 @@ export function demoPage(): string {
 <title>Team Memory MCP: demo and write-up</title>
 <meta property="og:title" content="Your MCP server runs on API keys. Enterprises won't.">
 <meta property="og:description" content="Team Memory MCP: an example MCP server secured with WorkOS AuthKit. Demo video and companion post.">
-<meta property="og:image" content="/media/poster.jpg">
+<meta property="og:image" content="${origin}/media/poster.jpg">
 <style>
   :root { color-scheme: dark; --bg: #0b0d12; --panel: #12151c; --edge: #262b36; --text: #f2f4f8; --dim: #9aa2b1; --accent: #6366f1; }
   * { box-sizing: border-box; }
@@ -45,7 +45,7 @@ export function demoPage(): string {
     <a href="${REPO}">Source and README</a>
     <a href="${REPO}#with-more-time">With more time</a>
     <a href="/">Live server</a>
-    <a href="/media/team-memory-demo.mp4" download>Download video (2:33)</a>
+    <a href="/media/team-memory-demo.mp4" download>Download video</a>
   </div>
 
   <article>
@@ -59,7 +59,7 @@ export function demoPage(): string {
       <img src="/media/three-checks.jpg" width="1392" height="860" loading="lazy" alt="A recall call carrying a Bearer token passes three checks: verify the token against AuthKit's public keys, confirm membership with the WorkOS API (cached 60 seconds), and query D1 only where org_id equals the token's org_id.">
       <figcaption>Every call: the token, the membership, then a query scoped to the token's organization.</figcaption>
     </figure>
-    <p>Clone the repo, add your WorkOS keys, and connect it to Claude Code. The README covers setup and what comes next: teams with Fine-Grained Authorization, roles, audit logs, and Directory Sync.</p>
+    <p>Clone the repo, add your WorkOS keys, and connect it to Claude Code. The README covers setup and what comes next: teams with Fine-Grained Authorization, roles, Directory Sync, and Pipes.</p>
     <p><a href="${REPO}">github.com/aj47/team-memory-mcp</a></p>
   </article>
 

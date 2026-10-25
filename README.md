@@ -45,12 +45,13 @@ account, and Node 20+.
    npx wrangler d1 create team-memory-mcp     # put the database_id in wrangler.jsonc
    npx wrangler d1 migrations apply team-memory-mcp --remote
    ```
-2. **Point it at your AuthKit.** Set `AUTHKIT_DOMAIN` in `wrangler.jsonc` (WorkOS dashboard →
-   Domains, or `workos project list`). Then add your WorkOS secret API key as a Worker secret:
+2. **Point it at your AuthKit.** Set `AUTHKIT_DOMAIN` in `wrangler.jsonc` to your environment's
+   AuthKit domain (WorkOS dashboard → Domains, or `workos project list`).
+3. **Deploy and add the secret.** `npm run deploy` prints your URL; the MCP endpoint is
+   `<url>/mcp`. Then add your WorkOS secret API key (dashboard → API Keys) as a Worker secret:
    ```sh
    npx wrangler secret put WORKOS_API_KEY
    ```
-3. **Deploy.** `npm run deploy` prints your URL; the MCP endpoint is `<url>/mcp`.
 4. **Configure WorkOS** (dashboard → Connect → Configuration):
    - **MCP Auth → Manage:** enable Client ID Metadata Document, and Dynamic Client
      Registration for older clients.
@@ -64,14 +65,21 @@ account, and Node 20+.
    ```
    Run `/mcp`, choose team-memory, sign in, and ask it to remember something.
 
+To keep your values out of git, copy `wrangler.jsonc` to `wrangler.local.jsonc` (git-ignored) and
+pass `-c wrangler.local.jsonc` to each wrangler command.
+
+`npm run dev` serves the sign-in challenge and metadata locally; signing in against localhost is
+untested. The `/demo` page's video comes from an optional R2 binding, `MEDIA`, which the template
+leaves out.
+
 ### Test without an MCP client
 
 ```sh
-sh test/no-token.sh <url>                                    # the 401 challenge
+sh test/no-token.sh <url>                                    # the 401 challenges
 node scripts/dev-token.mjs <url>/mcp alice                   # sign in; saves .token.local-alice
 node scripts/call.mjs <url>/mcp alice remember '{"text":"Deploys freeze on Fridays."}'
 node scripts/call.mjs <url>/mcp alice recall '{"query":"deploys"}'
-npm test                                                     # 15 unit tests
+npm test                                                     # 19 unit tests
 ```
 
 `dev-token.mjs` does what an MCP client does: reads the server's metadata, registers with
@@ -84,7 +92,7 @@ to sign in as someone else in the same browser.
   reaches a client.
 - The server stores no user tokens. It verifies each request's bearer token against AuthKit's
   public keys (`/oauth2/jwks`).
-- `.dev.vars`, `.token.local-*` and `.demo-users.local.json` are git-ignored.
+- `.dev.vars`, `wrangler.local.jsonc`, `.token.local-*` and `.demo-users.local.json` are git-ignored.
 
 ## With more time
 
@@ -94,7 +102,13 @@ to sign in as someone else in the same browser.
   `recall` filtered to the teams the caller's membership can view.
 - **Roles:** let admins `forget` any note. Connect tokens carry no permissions, so add
   `organization_membership.roles` to a JWT template or look roles up on the server.
-- **Audit Logs:** record who stored and read what, and stream it to the customer's SIEM.
 - **Directory Sync:** offboard automatically when IT removes someone from Okta or Entra.
+- **Pipes:** let people connect their GitHub or Slack accounts through WorkOS
+  [Pipes](https://workos.com/docs/pipes), which handles the third-party OAuth and token refresh,
+  so the server can pull context from those tools into memory.
+- **Audit Logs:** record who stored and read what, and stream it to the customer's SIEM.
+- **Prompt injection:** notes are shared org-wide and land in every teammate's agent context, so
+  recalled notes are untrusted data. Options: attribution with each note (`recall` already shows
+  the author's id), admin review, or content filtering.
 - **Search:** full-text or vector search instead of word matching over the latest 500 notes.
 - **Revocation:** in testing, Claude Code's token after a deactivation came back without `org_id`, which the server refuses. Confirm whether that is AuthKit's refresh behavior, and whether removal revokes the refresh token outright.

@@ -6,7 +6,7 @@
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
     // Your environment's AuthKit domain (WorkOS dashboard → Domains, or `workos project list`).
-    "AUTHKIT_DOMAIN": "incredible-picture-33-staging.authkit.app",
+    "AUTHKIT_DOMAIN": "your-subdomain.authkit.app",
     "MEMBERSHIP_CACHE_SECONDS": "60"
   },
   // WORKOS_API_KEY is a secret: `npx wrangler secret put WORKOS_API_KEY`.
@@ -14,11 +14,10 @@
     {
       "binding": "DB",
       "database_name": "team-memory-mcp",
-      "database_id": "914a36d3-207c-4892-b8de-f0627b7b9c80",
+      // From `npx wrangler d1 create team-memory-mcp`.
+      "database_id": "your-database-id",
       "migrations_dir": "migrations"
     }
   ],
-  // Demo video and poster for /demo. Optional: remove this if you only want the MCP server.
-  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "team-memory-media" }],
   "observability": { "enabled": true }
 }
