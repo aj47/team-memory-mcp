@@ -2,13 +2,29 @@ import { describe, expect, it } from 'vitest'
 import { AUTH_SERVER, RESOURCE, mcpRequest, testServer } from './helpers.js'
 
 describe('sign-in', () => {
-  it('answers a request without a token with 401 and the metadata URL', async () => {
+  const METADATA = 'resource_metadata="https://memory.example.com/.well-known/oauth-protected-resource"'
+
+  it('answers a request without a token with a bare challenge and the metadata URL', async () => {
     const { fetch } = await testServer()
     const res = await fetch(mcpRequest('tools/list', {}))
     expect(res.status).toBe(401)
-    expect(res.headers.get('WWW-Authenticate')).toContain(
-      'resource_metadata="https://memory.example.com/.well-known/oauth-protected-resource"',
-    )
+    expect(res.headers.get('WWW-Authenticate')).toBe(`Bearer ${METADATA}`)
+  })
+
+  it('answers a bad token with invalid_token and the metadata URL', async () => {
+    const { fetch } = await testServer()
+    const res = await fetch(mcpRequest('tools/list', {}, 'abc'))
+    expect(res.status).toBe(401)
+    const challenge = res.headers.get('WWW-Authenticate')!
+    expect(challenge).toMatch(/^Bearer error="invalid_token"/)
+    expect(challenge).toContain(METADATA)
+  })
+
+  it('answers 502 when AuthKit metadata is unavailable', async () => {
+    const down = (async () => new Response('down', { status: 500 })) as typeof globalThis.fetch
+    const { fetch } = await testServer({ fetchImpl: down })
+    const res = await fetch(new Request('https://memory.example.com/.well-known/oauth-authorization-server'))
+    expect(res.status).toBe(502)
   })
 
   it('points MCP clients at AuthKit', async () => {

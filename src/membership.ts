@@ -7,8 +7,12 @@ export type MembershipCheck = (userId: string, orgId: string) => Promise<boolean
 export interface MembershipOptions {
   /** The WorkOS secret API key (a Worker secret, never sent to clients). */
   apiKey: string
-  /** How long an answer is reused. This is the longest a removed member keeps access. */
+  /** How long a "member" answer is reused. This is the longest a removed member keeps access. */
   ttlSeconds?: number
+  /** How long a "not a member" answer is reused, so someone re-added gets in quickly. */
+  negativeTtlSeconds?: number
+  /** Most answers kept per isolate; the oldest is dropped past this. */
+  maxEntries?: number
   fetchImpl?: typeof fetch
   now?: () => number
 }
@@ -16,10 +20,21 @@ export interface MembershipOptions {
 export function createMembershipCheck({
   apiKey,
   ttlSeconds = 60,
+  negativeTtlSeconds = 10,
+  maxEntries = 1000,
   fetchImpl = fetch,
   now = Date.now,
 }: MembershipOptions): MembershipCheck {
+  // A Map iterates in insertion order, so the first key is the oldest entry.
   const cache = new Map<string, { active: boolean; expires: number }>()
+
+  const remember = (key: string, active: boolean) => {
+    const t = now()
+    for (const [k, v] of cache) if (v.expires <= t) cache.delete(k)
+    cache.delete(key)
+    while (cache.size >= maxEntries) cache.delete(cache.keys().next().value!)
+    cache.set(key, { active, expires: t + (active ? ttlSeconds : Math.min(negativeTtlSeconds, ttlSeconds)) * 1000 })
+  }
 
   return async (userId, orgId) => {
     const key = `${userId}:${orgId}`
@@ -35,7 +50,7 @@ export function createMembershipCheck({
 
     const body = (await res.json()) as { data: { status: string }[] }
     const active = body.data.some((m) => m.status === 'active')
-    cache.set(key, { active, expires: now() + ttlSeconds * 1000 })
+    remember(key, active)
     return active
   }
 }

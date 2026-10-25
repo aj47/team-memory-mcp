@@ -51,7 +51,11 @@ export function createTokenVerifier({ issuer, audience, jwks }: VerifierOptions)
     }
     // Connect tokens carry the organization chosen at sign-in as `org_id`.
     if (typeof payload.org_id !== 'string') {
-      throw new AuthError(403, 'no_organization', 'Access ended: you aren’t an active member of an organization here.')
+      throw new AuthError(
+        403,
+        'no_organization',
+        'This token has no organization. Sign in again and choose your organization; if you’ve left it, access has ended.',
+      )
     }
 
     return {
